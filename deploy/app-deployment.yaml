@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 
+    kanban-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kanban-app
+  template:
+    metadata:
+      labels:
+        app: kanban-app
+    spec:
+      containers:
+      - name: appserver
+        image: martold/itmo:app
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: "prd"
+          - name: DB_URL
+            value: "jdbc:postgresql://kanban-app-postgres-service:5432/demodb?user=postgres&password=postgres"
+          - name: PIC_DIR
+            value: "/opt/picDir"
+          - name: REDIS_HOST
+            value: "kanban-app-redis-service"
+          - name: REDIS_PORT
+            value: "6379"     
+        volumeMounts:
+          - mountPath: "/opt/picDir"
+            name: appserver-pvc
+      volumes:
+      - name: appserver-pvc
+        persistentVolumeClaim:
+          claimName: kanban-app-pvc
+          
