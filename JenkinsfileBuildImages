@@ -1,24 +1,23 @@
 node {
     def app
-    def customImage
-
+    
     stage('Clone repository') {
       
         checkout scm
     }
 
     stage('Building and Push Docker Image for Backend Application') {
-    def customImage = docker.build("martold/itmo:app", "./kanban-app")
-    customImage.push()
+    app = docker.build("martold/itmo:app", "./kanban-app")
+    app.push()
 
-    customImage.push('latest')
+    app.push('latest')
     }
 
     stage('Building and Push Docker Image for Angular WebUI') {
-    def customImage = docker.build("martold/itmo:webui", "./kanban-ui")
-    customImage.push()
+    app = docker.build("martold/itmo:webui", "./kanban-ui")
+    app.push()
 
-    customImage.push('latest')
+    app.push('latest')
     }
     // stage('Build image') {
   
