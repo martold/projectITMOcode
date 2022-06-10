@@ -1,0 +1,30 @@
+node {
+    def app
+
+    stage('Clone repository') {
+      
+        checkout scm
+    }
+
+    stage('Update GIT') {
+            script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                        sh "git config user.email sergeevnikitay@gmail.com"
+                        sh "git config user.name martold"
+                        //sh "git switch master"
+                        sh "cat ./deploy/kanban-app-deployment.yaml"
+                        sh "sed -i 's+martold/itmo.*+martold/itmo:${DOCKERTAGAPP}+g' ./deploy/kanban-app-deployment.yaml"
+                        sh "cat ./deploy/kanban-app-deployment.yaml"
+                        sh "cat ./deploy/kanban-ui-deployment.yaml"
+                        sh "sed -i 's+martold/itmo.*+martold/itmo:${DOCKERTAGWEBUI}+g' ./deploy/kanban-ui-deployment.yaml"
+                        sh "cat ./deploy/kanban-ui-deployment.yaml"
+                        sh "git add ."
+                        sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/projectITMO.git HEAD:main"
+      }
+    }
+  }
+}
+}

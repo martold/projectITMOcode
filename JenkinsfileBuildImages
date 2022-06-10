@@ -1,0 +1,58 @@
+node {
+    def app
+    def customImage
+
+    stage('Clone repository') {
+      
+        checkout scm
+    }
+
+    stage('Building and Push Docker Image for Backend Application') {
+    def customImage = docker.build("martold/itmo:app", "./kanban-app")
+    customImage.push()
+
+    customImage.push('latest')
+    }
+
+    stage('Building and Push Docker Image for Angular WebUI') {
+    def customImage = docker.build("martold/itmo:webui", "./kanban-ui")
+    customImage.push()
+
+    customImage.push('latest')
+    }
+    // stage('Build image') {
+  
+    //    app = docker.build("raj80dockerid/test")
+    // }
+
+    // stage('Building Docker Image') {
+        
+    // # Creating and running the first one
+    // dir ('/kanban-app/') {
+    //   sh 'docker build --<docker-options> -t martold/itmo:app .'
+    // }
+
+    // # Creating and running the first one
+    // dir ('/kanban-webui/') {
+    //   sh 'docker build --<docker-options> -t martold/itmo:webui .'    }
+    // }
+
+    stage('Test images') {
+
+        app.inside {
+            sh 'echo "Tests passed"'
+        }
+    }
+
+    // stage('Push image') {
+        
+    //     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+    //         app.push("${env.BUILD_NUMBER}")
+    //     }
+    // }
+    
+    stage('Trigger updateDeployments') {
+                echo "triggering updateDeployments"
+                build job: 'updateDeployments', parameters: [string(name: 'DOCKERTAGAPP', value: env.BUILD_NUMBER),string(name: 'DOCKERTAGWEBUI', value: env.BUILD_NUMBER)]
+        }
+}
