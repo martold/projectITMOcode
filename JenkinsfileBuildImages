@@ -1,24 +1,36 @@
 node {
     def app
-    
+    def web
+
     stage('Clone repository') {
       
         checkout scm
     }
 
-    stage('Building and Push Docker Image for Backend Application') {
+    stage('Building Docker Image for Backend Application') {
     app = docker.build("martold/itmo:app", "./kanban-app")
-    app.push()
 
-    app.push('latest')
     }
 
-    stage('Building and Push Docker Image for Angular WebUI') {
-    app = docker.build("martold/itmo:webui", "./kanban-ui")
-    app.push()
-
-    app.push('latest')
+    stage('Push Backend Application image') {
+        
+        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+            app.push("${env.BUILD_NUMBER}")
+        }
     }
+
+    stage('Building Docker Image for Angular WebUI') {
+    web = docker.build("martold/itmo:webui", "./kanban-ui")
+ 
+    }
+
+    stage('Push Backend Application image') {
+        
+        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+            web.push("${env.BUILD_NUMBER}")
+        }
+    }
+
     // stage('Build image') {
   
     //    app = docker.build("raj80dockerid/test")
@@ -36,17 +48,10 @@ node {
     //   sh 'docker build --<docker-options> -t martold/itmo:webui .'    }
     // }
 
-    stage('Test images') {
+    // stage('Test images') {
 
-        app.inside {
-            sh 'echo "Tests passed"'
-        }
-    }
-
-    // stage('Push image') {
-        
-    //     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-    //         app.push("${env.BUILD_NUMBER}")
+    //     app.inside {
+    //         sh 'echo "Tests passed"'
     //     }
     // }
     
