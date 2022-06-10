@@ -18,7 +18,7 @@ spec:
         io.kompose.service: kanban-ui
     spec:
       containers:
-        - image: martold/itmo:8
+        - image: martold/itmo:9
           name: kanban-ui
           ports:
             - containerPort: 80

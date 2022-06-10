@@ -27,7 +27,7 @@ spec:
               value: kanban
             - name: POSTGRES_USER
               value: kanban
-          image: martold/itmo:8
+          image: martold/itmo:9
           name: kanban-app
           ports:
             - containerPort: 8080
