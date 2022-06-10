@@ -15,7 +15,7 @@ node {
     stage('Push Backend Application image') {
         
         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            app.push("app_${env.BUILD_NUMBER}")
+            app.push("app_2.${env.BUILD_NUMBER}")
         }
     }
 
@@ -27,33 +27,9 @@ node {
     stage('Push Backend Application image') {
         
         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            web.push("web_${env.BUILD_NUMBER}")
+            web.push("web_2.${env.BUILD_NUMBER}")
         }
     }
-
-    // stage('Build image') {
-  
-    //    app = docker.build("raj80dockerid/test")
-    // }
-
-    // stage('Building Docker Image') {
-        
-    // # Creating and running the first one
-    // dir ('/kanban-app/') {
-    //   sh 'docker build --<docker-options> -t martold/itmo:app .'
-    // }
-
-    // # Creating and running the first one
-    // dir ('/kanban-webui/') {
-    //   sh 'docker build --<docker-options> -t martold/itmo:webui .'    }
-    // }
-
-    // stage('Test images') {
-
-    //     app.inside {
-    //         sh 'echo "Tests passed"'
-    //     }
-    // }
     
     stage('Trigger updateDeployments') {
                 echo "triggering updateDeployments"
